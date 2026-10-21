@@ -1,3 +1,4 @@
+
 'use strict';
 // middleware/rateLimiter.js
 //
@@ -23,4 +24,17 @@
 //   const rateLimit = require('express-rate-limit');
 //   module.exports = rateLimit({ ...options });
 
-module.exports = (req, res, next) => next(); // TODO: replace this stub
+const rateLimit = require('express-rate-limit');
+
+// In a multi-instance deployment, rate-limit-redis can replace the default
+// in-memory store with a shared Redis store. All instances then use the same
+// counters for each IP. An in-memory store keeps separate counters per instance,
+// so requests distributed by a load balancer could bypass the intended limit.
+
+module.exports = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: true,
+});
